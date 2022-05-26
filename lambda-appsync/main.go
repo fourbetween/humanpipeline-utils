@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -34,10 +33,10 @@ func Fetch(p Params) ([]byte, error) {
 	req.Header.Set("Cache-Control", "no-cache")
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
 
-	config := aws.Config{Region: aws.String(os.Getenv("REGION"))}
+	config := aws.Config{Region: aws.String(p.Region)}
 	sess := session.Must(session.NewSession(&config))
 	signer := v4.NewSigner(sess.Config.Credentials)
-	signer.Sign(req, bytes.NewReader(reqBodyJson), "appsync", os.Getenv("REGION"), time.Now())
+	signer.Sign(req, bytes.NewReader(reqBodyJson), "appsync", p.Region, time.Now())
 
 	client := &http.Client{}
 	res, err := client.Do(req)
